@@ -1,4 +1,3 @@
-````markdown
 # TaskPlus - Backend
 
 ### 📌 Descrição
@@ -40,14 +39,18 @@ git clone https://github.com/DevMboo/taskplus-back
 
 3️⃣ **Configure o JDK**
 
-* Certifique-se de que você tem **Java 17** (ou versão compatível) configurado no IntelliJ.
+* Certifique-se de que você tem **Java 21** (ou versão compatível) configurado no IntelliJ.
 
 4️⃣ **Compile o projeto**
 
 * Use a aba **Maven** no IntelliJ e execute o comando:
 
 ```
-clean install
+mvn clean
+```
+* Logo em seguida execute 
+```
+mvn install
 ```
 
 5️⃣ **Rodar a aplicação**
@@ -96,7 +99,7 @@ A interface web do H2 fica disponível em:
 http://localhost:8080/h2-console
 ```
 
-* JDBC URL: `jdbc:h2:mem:testdb`
+* JDBC URL: `jdbc:h2:mem:taskplusdb`
 * Username: `sa`
 * Password: (em branco)
 

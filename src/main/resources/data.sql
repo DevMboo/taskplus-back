@@ -4,13 +4,36 @@ CREATE TABLE teams (
     name VARCHAR(255) NOT NULL
 );
 
+INSERT INTO teams (name) VALUES
+('Diretoria Executiva'),
+('Administrativo'),
+('Financeiro'),
+('Recursos Humanos'),
+('Marketing'),
+('Vendas'),
+('Atendimento ao Cliente'),
+('Tecnologia da Informação'),
+('Desenvolvimento de Produtos'),
+('Operações'),
+('Logística'),
+('Jurídico'),
+('Compras'),
+('Qualidade'),
+('Produção'),
+('Pesquisa e Desenvolvimento'),
+('Infraestrutura'),
+('Comunicação'),
+('Treinamento e Desenvolvimento'),
+('Segurança do Trabalho');
+
 -- TABELA DE USUÁRIOS
 CREATE TABLE users (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    username VARCHAR(255) UNIQUE NOT NULL,
+    name VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     team_id BIGINT NOT NULL,
+    profile ENUM('ADMINISTRADOR', 'COLABORADOR') DEFAULT 'COLABORADOR',
     FOREIGN KEY (team_id) REFERENCES teams(id) ON DELETE CASCADE
 );
 

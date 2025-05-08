@@ -4,6 +4,10 @@ spring:
     driver-class-name: org.h2.Driver
     username: sa
     password:
+  logging:
+    level:
+      root: INFO
+      com.taskplus_back: DEBUG
   h2:
     console:
       enabled: true
@@ -13,7 +17,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
+jwt:
+  secret-key: "4bb2bcce3e6c4666820371de08b9ab2aae0a76d8d6fe462b870e9b4cfa5dc390"
+  validity: 86400000
