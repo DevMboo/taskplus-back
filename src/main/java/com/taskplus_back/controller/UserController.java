@@ -32,7 +32,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> save(@RequestBody UserDTO userDTO, @CookieValue("token") String token) {
+    public ResponseEntity<User> save(@RequestBody UserDTO userDTO, @CookieValue(value = "token", required = false) String token) {
         User savedUser = userService.save(userDTO, token);
         return ResponseEntity.status(201).body(savedUser);
     }
