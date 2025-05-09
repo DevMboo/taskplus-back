@@ -9,7 +9,7 @@ import com.taskplus_back.exception.BusinessException;
 import com.taskplus_back.exception.UnauthorizedException;
 import com.taskplus_back.repository.TaskRepository;
 import com.taskplus_back.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
+import com.taskplus_back.exception.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -100,12 +100,12 @@ public class TaskService {
 
     private Task getTaskFromUserTeamOrThrow(Long taskId, User usuarioLogado) {
         return taskRepository.findByIdAndTeamId(taskId, usuarioLogado.getTeam().getId())
-                .orElseThrow(() -> new EntityNotFoundException("Tarefa não encontrada ou você não tem permissão para acessá-la"));
+                .orElseThrow(() -> new BusinessException("Tarefa não encontrada ou você não tem permissão para acessá-la"));
     }
 
     private User getUserOrThrow(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado com ID: " + userId));
+                .orElseThrow(() -> new BusinessException("Usuário não encontrado com ID: " + userId));
     }
 
     private void updateTaskFields(Task existing, TaskDTO taskDTO) {

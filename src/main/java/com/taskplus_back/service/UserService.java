@@ -1,18 +1,19 @@
 package com.taskplus_back.service;
 
+import com.taskplus_back.component.JwtTokenProvider;
 import com.taskplus_back.dto.UserDTO;
-import com.taskplus_back.entity.Team;
+
 import com.taskplus_back.entity.User;
 import com.taskplus_back.enums.ProfileUser;
 import com.taskplus_back.exception.BusinessException;
 import com.taskplus_back.exception.EntityNotFoundException;
+
 import com.taskplus_back.repository.TeamRepository;
 import com.taskplus_back.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserService {
@@ -20,11 +21,18 @@ public class UserService {
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    public UserService(UserRepository userRepository, TeamRepository teamRepository, PasswordEncoder passwordEncoder) {
+    public UserService(
+            UserRepository userRepository,
+            TeamRepository teamRepository,
+            PasswordEncoder passwordEncoder,
+            JwtTokenProvider jwtTokenProvider
+    ) {
         this.userRepository = userRepository;
         this.teamRepository = teamRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     public List<User> findAll() {
@@ -36,7 +44,29 @@ public class UserService {
                 .orElseThrow(() -> new EntityNotFoundException("Time não encontrado com ID: " + id));
     }
 
-    public User save(UserDTO userDTO) {
+    public User save(UserDTO userDTO, String token) {
+        if (userRepository.existsByEmail(userDTO.getEmail())) {
+            throw new BusinessException("E-mail já está em uso");
+        }
+
+        boolean existsUsers = userRepository.count() > 0;
+
+        if (existsUsers && token != null && !token.isEmpty()) {
+            try {
+                String loggedUserEmail = jwtTokenProvider.getUsernameFromToken(token.replace("Bearer ", ""));
+
+                userRepository.findByEmail(loggedUserEmail).ifPresent(loggedUser -> {
+                    if (!loggedUser.getTeam().getId().equals(userDTO.getTeamId())) {
+                        throw new BusinessException("Você só pode cadastrar usuários no seu próprio time");
+                    }
+                });
+            } catch (BusinessException e) {
+                throw e;
+            } catch (Exception e) {
+                System.out.println("Erro ao validar token: " + e.getMessage());
+            }
+        }
+
         userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         User user = converToEntity(userDTO);
         return userRepository.save(user);

@@ -30,7 +30,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/v1/auth/login",
+                                "/auth/login",
                                 "/h2-console/**"
                         ).permitAll()
                         .requestMatchers(HttpMethod.POST, "/v1/users").permitAll()
