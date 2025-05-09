@@ -26,16 +26,20 @@ public class AuthService {
     }
 
     public LoginResponseDTO login(LoginDTO loginDTO) {
-        User user  = userRepository.findByEmail(loginDTO.getEmail())
-                .orElseThrow(() -> new BusinessException("E-mail ou senha estão inválidos"));
+        try {
+            User user  = userRepository.findByEmail(loginDTO.getEmail())
+                    .orElseThrow(() -> new BusinessException("E-mail ou senha estão inválidos"));
 
-        if(!passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
-            throw new BusinessException("E-mail ou senha estão inválidos");
+            if(!passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
+                throw new BusinessException("E-mail ou senha estão inválidos");
+            }
+
+            String token = jwtTokenProvider.generateToken(user.getEmail());
+
+            return new LoginResponseDTO(token);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-
-        String token = jwtTokenProvider.generateToken(user.getEmail());
-
-        return new LoginResponseDTO(token);
 
     }
 }
