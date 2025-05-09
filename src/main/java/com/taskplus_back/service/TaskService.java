@@ -3,13 +3,15 @@ package com.taskplus_back.service;
 import com.taskplus_back.component.JwtTokenProvider;
 import com.taskplus_back.dto.TaskDTO;
 import com.taskplus_back.entity.Task;
+
+import com.taskplus_back.entity.Team;
 import com.taskplus_back.entity.User;
 import com.taskplus_back.enums.StatusTask;
 import com.taskplus_back.exception.BusinessException;
 import com.taskplus_back.exception.UnauthorizedException;
 import com.taskplus_back.repository.TaskRepository;
 import com.taskplus_back.repository.UserRepository;
-import com.taskplus_back.exception.EntityNotFoundException;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,6 +30,12 @@ public class TaskService {
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
         this.jwtTokenProvider = jwtTokenProvider;
+    }
+
+    public Task findTaskById(Long taskId, String token) {
+        User usuarioLogado = getUsuarioFromToken(token);
+        return taskRepository.findByIdAndTeamId(taskId, usuarioLogado.getTeam().getId())
+                .orElseThrow(() -> new BusinessException("Tarefa não encontrada ou você não tem permissão para acessá-la"));
     }
 
     private User getUsuarioFromToken(String token) {
@@ -78,6 +86,17 @@ public class TaskService {
     public List<Task> findAllTasksFromUserTeam(String token) {
         User usuarioLogado = getUsuarioFromToken(token);
         return taskRepository.findByTeamId(usuarioLogado.getTeam().getId());
+    }
+
+    public List<Task> findTasksByFilters(String token, StatusTask status, Long responsibleId) {
+        User user = getUsuarioFromToken(token);
+        if (user == null || user.getTeam() == null) {
+            throw new BusinessException("Usuário não tem equipe associada");
+        }
+        return taskRepository.findByUserIdAndFilters(
+                status,
+                responsibleId
+        );
     }
 
     public List<Task> findTasksByStatusFromUserTeam(StatusTask status, String token) {

@@ -74,11 +74,19 @@ public class UserService {
 
     public User update(Long id, UserDTO userDTO) {
         User existing = getUserOrThrow(id);
+
+        if (userDTO.getEmail() != null && !userDTO.getEmail().equals(existing.getEmail())) {
+            if (userRepository.existsByEmail(userDTO.getEmail())) {
+                throw new BusinessException("O email informado já está em uso por outro usuário");
+            }
+        }
+
         if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
             userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         } else {
             userDTO.setPassword(existing.getPassword());
         }
+
         updateUserFields(existing, userDTO);
         return userRepository.save(existing);
     }
@@ -100,8 +108,12 @@ public class UserService {
         if(userDTO.getPerfil() != null) {
             existing.setPerfil(userDTO.getPerfil());
         }
-        existing.setTeam(teamRepository.findById(userDTO.getTeamId()).orElseThrow(()
-                -> new BusinessException("Time não encontrado")));
+        if (userDTO.getTeamId() != null) {
+            existing.setTeam(
+                    teamRepository.findById(userDTO.getTeamId())
+                            .orElseThrow(() -> new BusinessException("Time não encontrado"))
+            );
+        }
     }
 
     public User converToEntity(UserDTO userDTO) {

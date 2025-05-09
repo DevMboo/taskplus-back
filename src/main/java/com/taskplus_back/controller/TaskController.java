@@ -35,11 +35,26 @@ public class TaskController {
         return ResponseEntity.ok(tasks);
     }
 
-    @GetMapping("/filter")
-    public ResponseEntity<List<Task>> getTasksByStatus(
-            @RequestParam StatusTask status,
+    @GetMapping("/{taskId}")
+    public ResponseEntity<Task> findById(
+            @PathVariable Long taskId,
             @CookieValue("token") String token) {
-        List<Task> tasks = taskService.findTasksByStatusFromUserTeam(status, token);
+        Task task = taskService.findTaskById(taskId, token);
+        return ResponseEntity.ok(task);
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<List<Task>> getTasksByFilter(
+            @RequestParam(required = false) StatusTask status,
+            @RequestParam(required = false) Long responsibleId,
+            @CookieValue("token") String token) {
+
+        if (status == null && responsibleId == null) {
+            List<Task> tasks = taskService.findAllTasksFromUserTeam(token);
+            return ResponseEntity.ok(tasks);
+        }
+
+        List<Task> tasks = taskService.findTasksByFilters(token, status, responsibleId);
         return ResponseEntity.ok(tasks);
     }
 

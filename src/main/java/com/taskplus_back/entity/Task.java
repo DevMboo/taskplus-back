@@ -31,7 +31,7 @@ public class Task {
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "ENUM('PENDENTE','EM_ANDAMENTO','CONCLUIDA')")
-    private StatusTask status = StatusTask.PENDENTE;
+    private StatusTask status;
 
     @Column(name = "due_date")
     private LocalDate dueDate;
